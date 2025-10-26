@@ -12,6 +12,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   await app.renderPage();
 
+  //  skip to content
+  const skipLink = document.querySelector('.skip-to-content');
+  if (skipLink) {
+    skipLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      const main = document.getElementById('main-content');
+      if (main) {
+        main.setAttribute('tabindex', '-1');
+        main.focus();
+        
+        main.addEventListener('blur', () => main.removeAttribute('tabindex'), { once: true });
+      }
+    });
+  }
+
   window.addEventListener('hashchange', async () => {
     await app.renderPage();
   });

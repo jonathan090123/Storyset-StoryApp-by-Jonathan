@@ -36,7 +36,18 @@ export function initMap(containerId) {
 }
 
 export function addMarker(map, lat, lng, popupContent, options = {}) {
-    const marker = L.marker([lat, lng], options).addTo(map);
+   // perbaikan marker v2
+    const defaultIcon = L.icon({
+        iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+
+    const markerOptions = Object.assign({ icon: defaultIcon }, options);
+    const marker = L.marker([lat, lng], markerOptions).addTo(map);
     if (popupContent) {
         marker.bindPopup(popupContent);
     }
