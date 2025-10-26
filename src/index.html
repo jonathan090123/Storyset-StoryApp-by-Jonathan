@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="shortcut icon" href="favicon.png">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <title>Storyset- Share your UNIQUE Story</title>
+</head>
+
+<body>
+  <a href="#main-content" class="skip-to-content">Skip to Content</a>
+
+  <header>
+    <div class="main-header container">
+        <a class="brand-name" href="#/" aria-label="Story App Home">
+            <img src="images/storyset.png" alt="Storygram Logo" style="height:71px;">
+        </a>
+      <nav id="navigation-drawer" class="navigation-drawer" aria-label="Main Navigation">
+        <ul id="nav-list" class="nav-list">
+          <li><a href="#/">Home</a></li>
+          <li><a href="#/add-story" id="nav-add-story" style="display: none;">Tambah Cerita</a></li>
+          <li><a href="#/login" id="nav-login">Login</a></li>
+          <li><a href="#/register" id="nav-register">Register</a></li>
+          <li><button id="nav-logout" style="display: none;" class="logout-btn">Logout</button></li>
+        </ul>
+      </nav>
+
+      <button id="drawer-button" class="drawer-button" aria-label="Toggle Navigation Menu"
+        aria-expanded="false">☰</button>
+    </div>
+  </header>
+
+  <main id="main-content" class="main-content" tabindex="-1"></main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>Storyset - Jonathan Alvin</p>
+    </div>
+  </footer>
+
+  <div id="loading-overlay" class="loading-overlay" style="display: none;">
+    <div class="spinner"></div>
+  </div>
+</body>
+
+</html>
