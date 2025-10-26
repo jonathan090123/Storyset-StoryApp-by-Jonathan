@@ -1,4 +1,43 @@
 /* Logo besar keluar dari navbar tanpa mengubah tinggi navbar */
+/* About page styles */
+.about-section {
+  padding: 40px 0;
+}
+
+.about-content {
+  max-width: 800px;
+  margin: 0 auto;
+  background: var(--card-bg);
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+
+.about-content h1 {
+  color: var(--primary-color);
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.about-description h2 {
+  color: var(--text-color);
+  margin: 24px 0 16px;
+}
+
+.about-description p {
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.about-description ul {
+  list-style-position: inside;
+  margin: 16px 0;
+}
+
+.about-description li {
+  margin-bottom: 8px;
+}
+
 .main-header {
   position: relative;
   height: 56px;

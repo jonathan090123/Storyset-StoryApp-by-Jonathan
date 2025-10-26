@@ -6,8 +6,7 @@ export function initMap(containerId) {
         center: [-2.5489, 118.0149],
         zoom: 5,
     });
-
-    // Multiple tile layers for Advanced criteria
+    
     const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors',
         maxZoom: 19,
@@ -23,10 +22,8 @@ export function initMap(containerId) {
         maxZoom: 17,
     });
 
-    // Add default layer
     streetLayer.addTo(map);
 
-    // Layer control for multiple tile layers
     const baseMaps = {
         'Street': streetLayer,
         'Satellite': satelliteLayer,
