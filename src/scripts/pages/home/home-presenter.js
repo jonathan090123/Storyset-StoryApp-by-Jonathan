@@ -34,7 +34,6 @@ export default class HomePresenter {
                 this.stories = response.listStory;
                 this.view.renderStories(this.stories);
                 this.initializeMap();
-                this.setupInteractions();
             } else {
                 this.view.showError('Gagal memuat cerita. Silakan login kembali.');
             }
@@ -68,7 +67,10 @@ export default class HomePresenter {
                 marker.storyIndex = index;
 
                 marker.on('click', () => {
-                    this.highlightStoryCard(index);
+                    // Delegate DOM highlighting to the view (presenter should not touch DOM)
+                    if (this.view && typeof this.view.highlightStoryCard === 'function') {
+                        this.view.highlightStoryCard(index);
+                    }
                 });
 
                 this.markers.push(marker);
@@ -76,32 +78,21 @@ export default class HomePresenter {
         });
     }
 
-    setupInteractions() {
-        const storyCards = document.querySelectorAll('.story-card');
 
-        storyCards.forEach((card, index) => {
-            // Mouse hover for highlight
-            card.addEventListener('mouseenter', () => {
-                this.highlightMarkerByIndex(index);
-            });
+    onCardMouseEnter(index) {
+        this.highlightMarkerByIndex(index);
+    }
 
-            card.addEventListener('mouseleave', () => {
-                this.resetAllMarkers();
-            });
+    onCardMouseLeave() {
+        this.resetAllMarkers();
+    }
 
-            // Click to sync with map
-            card.addEventListener('click', () => {
-                this.syncMapWithCard(index);
-            });
+    onCardClick(index) {
+        this.syncMapWithCard(index);
+    }
 
-            // Keyboard accessibility
-            card.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    this.syncMapWithCard(index);
-                }
-            });
-        });
+    onCardKeyActivate(index) {
+        this.syncMapWithCard(index);
     }
 
     highlightMarkerByIndex(index) {
@@ -127,16 +118,8 @@ export default class HomePresenter {
         }
     }
 
-    highlightStoryCard(index) {
-        const cards = document.querySelectorAll('.story-card');
-        cards.forEach(card => card.classList.remove('highlighted'));
-
-        if (cards[index]) {
-            cards[index].classList.add('highlighted');
-            cards[index].scrollIntoView({
-                behavior: 'smooth',
-                block: 'nearest'
-            });
-        }
+   
+    getStoryByIndex(index) {
+        return this.stories[index] || null;
     }
 }

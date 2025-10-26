@@ -18,5 +18,38 @@ export default class HomePage {
 
   async afterRender() {
     await this.presenter.loadStories();
+
+    // {PERBAIKAN v2 , semua event listener sudah dipindahkan ke sini }
+    const storyCards = document.querySelectorAll('.story-card');
+    storyCards.forEach((card, index) => {
+      // Mouse hover for highlight (map marker)
+      card.addEventListener('mouseenter', () => {
+        this.presenter.onCardMouseEnter(index);
+        card.classList.add('highlighted');
+      });
+
+      card.addEventListener('mouseleave', () => {
+        this.presenter.onCardMouseLeave();
+        card.classList.remove('highlighted');
+      });
+
+      // Click to sync with map
+      card.addEventListener('click', () => {
+        this.presenter.onCardClick(index);
+        // highlight and scroll the clicked card
+        card.classList.add('highlighted');
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+
+      // Keyboard accessibility
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this.presenter.onCardKeyActivate(index);
+          card.classList.add('highlighted');
+          card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      });
+    });
   }
 }

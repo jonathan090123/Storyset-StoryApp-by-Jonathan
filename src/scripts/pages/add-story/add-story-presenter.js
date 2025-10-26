@@ -15,9 +15,6 @@ import {
 import {
     initMap
 } from '../../utils/map-helper';
-import {
-    CameraHelper
-} from '../../utils/camera-helper';
 import L from 'leaflet';
 
 export default class AddStoryPresenter {
@@ -27,7 +24,6 @@ export default class AddStoryPresenter {
         this.selectedLocation = null;
         this.selectedMarker = null;
         this.selectedPhoto = null;
-        this.cameraHelper = new CameraHelper();
     }
 
     initializeMap() {
@@ -49,7 +45,7 @@ export default class AddStoryPresenter {
             this.map.removeLayer(this.selectedMarker);
         }
 
-        // Create marker with explicit icon URLs so the image loads reliably
+        // {perbaikan marker, sudah diberi isi icon seharusnya bisa muncul }
         const icon = L.icon({
             iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
             shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
@@ -63,59 +59,8 @@ export default class AddStoryPresenter {
         this.selectedMarker.bindPopup('Lokasi yang dipilih').openPopup();
     }
 
-    setupPhotoInput() {
-        const photoInput = document.getElementById('photo');
-        photoInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                this.selectedPhoto = file;
-                const imageUrl = URL.createObjectURL(file);
-                this.view.showPhotoPreview(imageUrl, file.name);
-            }
-        });
-    }
-
-    setupCameraFeature() {
-        const cameraBtn = document.getElementById('camera-btn');
-        const cameraContainer = document.getElementById('camera-container');
-        const video = document.getElementById('camera-video');
-        const captureBtn = document.getElementById('capture-btn');
-        const closeCameraBtn = document.getElementById('close-camera-btn');
-        const canvas = document.getElementById('camera-canvas');
-
-        cameraBtn.addEventListener('click', async () => {
-            const started = await this.cameraHelper.startCamera(video);
-            if (started) {
-                cameraContainer.style.display = 'block';
-                cameraBtn.style.display = 'none';
-            } else {
-                showToast('Tidak dapat mengakses kamera', 'error');
-            }
-        });
-
-        captureBtn.addEventListener('click', async () => {
-            const photoBlob = await this.cameraHelper.capturePhoto(video, canvas);
-            this.selectedPhoto = new File([photoBlob], 'camera-photo.jpg', {
-                type: 'image/jpeg'
-            });
-
-            const imageUrl = URL.createObjectURL(photoBlob);
-            this.view.showPhotoPreview(imageUrl, 'camera-photo.jpg');
-
-            this.cameraHelper.stopCamera();
-            video.srcObject = null;
-            cameraContainer.style.display = 'none';
-            cameraBtn.style.display = 'inline-block';
-
-            showToast('Foto berhasil diambil!', 'success');
-        });
-
-        closeCameraBtn.addEventListener('click', () => {
-            this.cameraHelper.stopCamera();
-            video.srcObject = null;
-            cameraContainer.style.display = 'none';
-            cameraBtn.style.display = 'inline-block';
-        });
+    setSelectedPhoto(file) {
+        this.selectedPhoto = file;
     }
 
     async handleSubmit(description) {
@@ -168,7 +113,6 @@ export default class AddStoryPresenter {
     }
 
     cleanup() {
-        this.cameraHelper.stopCamera();
         if (this.map) {
             this.map.remove();
         }

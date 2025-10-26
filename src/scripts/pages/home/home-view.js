@@ -55,6 +55,19 @@ export default class HomeView {
         const storiesContainer = document.getElementById('stories-list');
         storiesContainer.innerHTML = `<p class="error-message">${message}</p>`;
     }
+
+  highlightStoryCard(index) {
+    const cards = document.querySelectorAll('.story-card');
+    cards.forEach(card => card.classList.remove('highlighted'));
+
+    if (cards[index]) {
+      cards[index].classList.add('highlighted');
+      cards[index].scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest'
+      });
+    }
+  }
 }
 
 import {
