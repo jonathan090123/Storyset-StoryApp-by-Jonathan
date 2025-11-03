@@ -97,7 +97,36 @@ export default class AddStoryPresenter {
             const response = await addStory(token, formData);
 
             if (!response.error) {
+                // Show success toast
                 showToast('Cerita berhasil ditambahkan!', 'success');
+                
+                // If the story has an ID and photoUrl in response, we can use them
+                const storyId = response.story?.id;
+                const photoUrl = response.story?.photoUrl;
+                const notificationPayload = {
+                    title: 'Story Baru Ditambahkan!',
+                    body: description.substring(0, 100) + (description.length > 100 ? '...' : ''),
+                    icon: photoUrl || '/images/storyset.png', // Gunakan foto story sebagai icon
+                    image: photoUrl, // Thumbnail gambar story yang lebih besar
+                    badge: photoUrl || '/images/storyset.png', // Gunakan foto story sebagai badge juga
+                    url: storyId ? `/#/stories/${storyId}` : '/#/',
+                    actions: [
+                        {
+                            action: 'open',
+                            title: 'Lihat Story'
+                        }
+                    ]
+                };
+
+                // If browser supports Notification API directly, show a local notification
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    new Notification(notificationPayload.title, {
+                        body: notificationPayload.body,
+                        icon: notificationPayload.icon,
+                        image: notificationPayload.image,
+                        badge: notificationPayload.badge
+                    });
+                }
                 setTimeout(() => {
                     window.location.hash = '#/';
                 }, 1000);

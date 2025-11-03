@@ -8,6 +8,10 @@ const ENDPOINTS = {
   ADD_STORY: `${CONFIG.BASE_URL}/stories`,
 };
 
+// Optional endpoints for push subscription management on server (if provided by backend)
+ENDPOINTS.PUSH_SUBSCRIBE = `${CONFIG.BASE_URL}/subscribe`;
+ENDPOINTS.PUSH_UNSUBSCRIBE = `${CONFIG.BASE_URL}/unsubscribe`;
+
 export async function registerUser({ name, email, password }) {
   const response = await fetch(ENDPOINTS.REGISTER, {
     method: 'POST',
@@ -55,6 +59,31 @@ export async function addStory(token, formData) {
       'Authorization': `Bearer ${token}`,
     },
     body: formData,
+  });
+  return await response.json();
+}
+
+export async function sendPushSubscription(subscription, token) {
+  const response = await fetch(ENDPOINTS.PUSH_SUBSCRIBE, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(subscription),
+  });
+  return await response.json();
+}
+
+export async function removePushSubscription(endpointUrl, token) {
+  // If your backend expects to remove subscription by endpoint or id, pass it as JSON body
+  const response = await fetch(ENDPOINTS.PUSH_UNSUBSCRIBE, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ endpoint: endpointUrl }),
   });
   return await response.json();
 }
