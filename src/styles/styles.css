@@ -383,6 +383,30 @@ header {
   color: var(--text-color);
 }
 
+.stories-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.view-favorites-link {
+  font-size: 0.95rem;
+  color: var(--primary-color);
+  text-decoration: none;
+  background: linear-gradient(90deg, rgba(37,99,235,0.08), transparent);
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(37,99,235,0.12);
+}
+
+.view-favorites-link:hover,
+.view-favorites-link:focus {
+  background: linear-gradient(90deg, rgba(37,99,235,0.12), transparent);
+  box-shadow: var(--shadow);
+}
+
 .stories-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -396,6 +420,51 @@ header {
   box-shadow: var(--shadow);
   transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
+}
+
+.story-card .story-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.favorite-btn,
+.remove-favorite-btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.favorite-btn {
+  background: linear-gradient(90deg, var(--primary-color), var(--primary-hover));
+  color: #fff;
+}
+
+.favorite-btn:hover,
+.favorite-btn:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(37,99,235,0.18);
+}
+
+.remove-favorite-btn {
+  background: transparent;
+  color: var(--error-color);
+  border: 1px solid rgba(239,68,68,0.12);
+}
+
+.remove-favorite-btn:hover,
+.remove-favorite-btn:focus {
+  background: rgba(239,68,68,0.04);
 }
 
 .story-card:hover,
@@ -418,6 +487,19 @@ header {
   object-fit: cover;
 }
 
+/* Favorites page tweaks */
+.favorites-section {
+  padding-block: 8px;
+}
+
+.favorites-section .page-title {
+  margin-bottom: 12px;
+}
+
+.favorites-section .stories-grid {
+  gap: 18px;
+}
+
 .story-content {
   padding: 16px;
 }
@@ -432,6 +514,7 @@ header {
   color: var(--secondary-color);
   margin-bottom: 12px;
   display: -webkit-box;
+  line-clamp: 3;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;

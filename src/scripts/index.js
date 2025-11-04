@@ -9,6 +9,7 @@ import {
   unsubscribeFromPush,
   isPushSubscribed,
 } from './push-manager';
+import { showSuccess, showError } from './utils/toast';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const app = new App({
@@ -55,7 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!swRegistration) {
           // try to register again
           const r = await registerServiceWorker();
-          if (!r) return alert('Service worker not available in this browser.');
+          if (!r) return showError('Service worker not available in this browser.');
         }
 
         const current = await isPushSubscribed(swRegistration);
@@ -63,12 +64,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           await unsubscribeFromPush(swRegistration);
         } else {
           const perm = await requestNotificationPermission();
-          if (perm !== 'granted') return alert('Notification permission is required to enable push.');
+          if (perm !== 'granted') return showError('Notification permission is required to enable push.');
           const sub = await subscribeForPush(swRegistration);
           // Optionally: send subscription to server here using your API and auth token
           // await sendSubscriptionToServer(sub, token);
           console.log('Push subscription:', sub);
-          alert('Berhasil berlangganan notification!. Anda dapat mengetes notifikasi lewat DevTools atau dari server.');
+          showSuccess('Berhasil berlangganan notification!. Anda dapat mengetes notifikasi lewat DevTools atau dari server.');
         }
 
         await updateToggleState();

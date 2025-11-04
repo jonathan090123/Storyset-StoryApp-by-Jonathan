@@ -1,6 +1,8 @@
 import {
     getStoriesWithLocation
 } from '../../data/api';
+import { saveStory } from '../../utils/idb-helper';
+import { showSuccess, showError } from '../../utils/toast';
 import {
     getToken
 } from '../../utils/auth-helper';
@@ -121,5 +123,20 @@ export default class HomePresenter {
    
     getStoryByIndex(index) {
         return this.stories[index] || null;
+    }
+
+    async saveStoryToFavorite(storyId) {
+        const story = this.stories.find(s => s.id === storyId);
+        if (story) {
+            try {
+                await saveStory(story);
+                showSuccess('Story berhasil disimpan ke Favorit!');
+            } catch (err) {
+                console.error(err);
+                showError('Gagal menyimpan story ke Favorit.');
+            }
+        } else {
+            showError('Story tidak ditemukan!');
+        }
     }
 }

@@ -51,5 +51,14 @@ export default class HomePage {
         }
       });
     });
+
+  // Event handler untuk tombol Simpan ke Favorit
+  const favButtons = document.querySelectorAll('.favorite-btn');
+  favButtons.forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+    const storyId = btn.getAttribute('data-story-id');
+    await this.presenter.saveStoryToFavorite(storyId);
+    });
+  });
   }
 }

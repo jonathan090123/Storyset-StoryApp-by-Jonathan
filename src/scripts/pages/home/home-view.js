@@ -14,7 +14,10 @@ export default class HomeView {
         </div>
 
         <div class="stories-section">
-          <h2>Daftar Cerita</h2>
+          <div class="stories-header">
+            <h2>Daftar Cerita</h2>
+            <a href="#/favorites" class="view-favorites-link">Lihat Favorit</a>
+          </div>
           <div id="stories-list" class="stories-grid">
             <div class="loading-placeholder">Memuat cerita...</div>
           </div>
@@ -46,6 +49,9 @@ export default class HomeView {
           ${story.lat && story.lon ? 
             `<p class="story-location">📍 ${story.lat.toFixed(4)}, ${story.lon.toFixed(4)}</p>` 
             : ''}
+          <div class="card-actions">
+            <button class="favorite-btn" data-story-id="${story.id}">Simpan ke Favorit</button>
+          </div>
         </div>
       </article>
     `).join('');
