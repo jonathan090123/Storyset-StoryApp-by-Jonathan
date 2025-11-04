@@ -41,7 +41,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Service worker + Push toggle wiring
   try {
-    const swRegistration = await registerServiceWorker();
+    let swRegistration = await registerServiceWorker();
+    // Ensure we have an active registration; wait for ready if necessary
+    if (!swRegistration || !swRegistration.active) {
+      try {
+        swRegistration = await navigator.serviceWorker.ready;
+      } catch (e) {
+        // navigator.serviceWorker.ready may reject if no SW will ever control the page
+        console.warn('serviceWorker.ready not available:', e && e.message ? e.message : e);
+      }
+    }
     const pushToggle = document.getElementById('nav-push-toggle');
     if (pushToggle) {
       const updateToggleState = async () => {
@@ -53,10 +62,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       await updateToggleState();
 
       pushToggle.addEventListener('click', async () => {
-        if (!swRegistration) {
-          // try to register again
+        // Ensure we have an active registration before subscribing
+        if (!swRegistration || !swRegistration.pushManager || !swRegistration.active) {
+          // try to (re)register and/or wait for ready
           const r = await registerServiceWorker();
-          if (!r) return showError('Service worker not available in this browser.');
+          if (r && r.active) swRegistration = r;
+          else {
+            try {
+              const readyReg = await navigator.serviceWorker.ready;
+              swRegistration = readyReg;
+            } catch (err) {
+              return showError('Service worker not available in this browser.');
+            }
+          }
         }
 
         const current = await isPushSubscribed(swRegistration);

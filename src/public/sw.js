@@ -24,10 +24,24 @@ const APP_SHELL = [
 
 // Install event - cache app shell
 self.addEventListener('install', (event) => {
+  // Try to add all shell resources but handle missing items gracefully to avoid failing install
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(APP_SHELL))
-      .then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then(async (cache) => {
+      try {
+        await cache.addAll(APP_SHELL);
+        console.log('[SW] Cached app shell successfully');
+      } catch (err) {
+        console.warn('[SW] Some resources failed to cache during install:', err && err.message ? err.message : err);
+        // Attempt to add resources individually so available ones are cached
+        for (const resource of APP_SHELL) {
+          try {
+            await cache.add(resource);
+          } catch (e) {
+            console.warn('[SW] Failed to cache resource:', resource, e && e.message ? e.message : e);
+          }
+        }
+      }
+    }).then(() => self.skipWaiting())
   );
 });
 
@@ -46,6 +60,10 @@ self.addEventListener('activate', (event) => {
     }).then(() => self.clients.claim())
   );
 });
+
+// Log lifecycle events for easier debugging
+self.addEventListener('install', () => console.log('[SW] install event'));
+self.addEventListener('activate', () => console.log('[SW] activate event'));
 
 // Open notification settings database
 function openNotificationDB() {
@@ -117,13 +135,8 @@ self.addEventListener('push', async (event) => {
     requireInteraction: true,
   };
 
-  // Double check subscription before showing notification
-  const subscription = await self.registration.pushManager.getSubscription();
-  if (!subscription) {
-    console.log('No active subscription, ignoring push event');
-    return;
-  }
-
+  // Show notification (allow DevTools-simulated pushes even without a subscription)
+  console.log('[SW] Showing notification:', data.title || 'Storyset');
   event.waitUntil(self.registration.showNotification(data.title || 'Storyset', options));
 });
 

@@ -28,6 +28,15 @@ module.exports = {
           from: path.resolve(__dirname, 'src/public/'),
           to: path.resolve(__dirname, 'dist/'),
         },
+        // Copy top-level manifest and favicon so they're available at site root
+        {
+          from: path.resolve(__dirname, 'manifest.json'),
+          to: path.resolve(__dirname, 'dist/manifest.json'),
+        },
+        {
+          from: path.resolve(__dirname, 'favicon.png'),
+          to: path.resolve(__dirname, 'dist/favicon.png'),
+        },
       ],
     }),
   ],
