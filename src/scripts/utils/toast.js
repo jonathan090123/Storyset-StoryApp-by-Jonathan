@@ -1,6 +1,6 @@
 // Simple toast utility
 export function showToast(message, type = 'success', duration = 3500) {
-  // create container if not exists
+
   let container = document.getElementById('toast-container');
   if (!container) {
     container = document.createElement('div');
@@ -23,7 +23,7 @@ export function showToast(message, type = 'success', duration = 3500) {
 
   container.appendChild(toast);
 
-  // show animation (CSS class already transitions transform)
+
   requestAnimationFrame(() => toast.classList.add('show'));
 
   const tidy = () => {
@@ -38,7 +38,6 @@ export function showToast(message, type = 'success', duration = 3500) {
 
   const timeoutId = setTimeout(tidy, duration);
 
-  // allow click to dismiss early
   toast.addEventListener('click', () => {
     clearTimeout(timeoutId);
     tidy();

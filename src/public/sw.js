@@ -103,7 +103,7 @@ async function isNotificationsEnabled() {
 
 // Handle incoming push events. Expect data as JSON with { title, body, icon, url, actions }
 self.addEventListener('push', async (event) => {
-  // First check if notifications are enabled in IndexedDB
+
   const isEnabled = await isNotificationsEnabled();
   
   if (!isEnabled) {

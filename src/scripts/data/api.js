@@ -76,7 +76,7 @@ export async function sendPushSubscription(subscription, token) {
 }
 
 export async function removePushSubscription(endpointUrl, token) {
-  // If your backend expects to remove subscription by endpoint or id, pass it as JSON body
+  
   const response = await fetch(ENDPOINTS.PUSH_UNSUBSCRIBE, {
     method: 'POST',
     headers: {
