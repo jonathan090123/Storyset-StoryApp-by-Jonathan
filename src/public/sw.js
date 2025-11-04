@@ -102,43 +102,47 @@ async function isNotificationsEnabled() {
 }
 
 // Handle incoming push events. Expect data as JSON with { title, body, icon, url, actions }
-self.addEventListener('push', async (event) => {
+self.addEventListener('push', (event) => {
+  // Must call waitUntil synchronously with a single Promise that wraps all async work
+  event.waitUntil(
+    (async () => {
+      const isEnabled = await isNotificationsEnabled();
 
-  const isEnabled = await isNotificationsEnabled();
-  
-  if (!isEnabled) {
-    console.log('Notifications are disabled, ignoring push event');
-    return;
-  }
-  
-  let data = { title: 'Storyset', body: 'You have a new message', icon: '/images/storyset.png', url: '/', actions: [] };
-  try {
-    if (event.data) {
-      const text = event.data.text();
-      data = JSON.parse(text);
-    }
-  } catch (err) {
-    // if parsing fails, fall back to simple text
-    data.body = event.data ? event.data.text() : data.body;
-  }
+      if (!isEnabled) {
+        console.log('Notifications are disabled, ignoring push event');
+        return;
+      }
 
-  const options = {
-    body: data.body,
-    icon: data.icon || '/images/storyset.png',
-    image: data.image,
-    badge: data.icon || '/images/storyset.png',
-    data: {
-      url: data.url || '/',
-      payload: data.payload || null,
-    },
-    actions: Array.isArray(data.actions) ? data.actions : [],
-    silent: false,
-    requireInteraction: true,
-  };
+      let data = { title: 'Storyset', body: 'You have a new message', icon: '/images/storyset.png', url: '/', actions: [] };
+      try {
+        if (event.data) {
+          const text = event.data.text();
+          data = JSON.parse(text);
+        }
+      } catch (err) {
+        // if parsing fails, fall back to simple text
+        data.body = event.data ? event.data.text() : data.body;
+      }
 
-  // Show notification (allow DevTools-simulated pushes even without a subscription)
-  console.log('[SW] Showing notification:', data.title || 'Storyset');
-  event.waitUntil(self.registration.showNotification(data.title || 'Storyset', options));
+      const options = {
+        body: data.body,
+        icon: data.icon || '/images/storyset.png',
+        image: data.image,
+        badge: data.icon || '/images/storyset.png',
+        data: {
+          url: data.url || '/',
+          payload: data.payload || null,
+        },
+        actions: Array.isArray(data.actions) ? data.actions : [],
+        silent: false,
+        requireInteraction: true,
+      };
+
+      // Show notification (allow DevTools-simulated pushes even without a subscription)
+      console.log('[SW] Showing notification:', data.title || 'Storyset');
+      await self.registration.showNotification(data.title || 'Storyset', options);
+    })()
+  );
 });
 
 // Re-subscribe handler placeholder
