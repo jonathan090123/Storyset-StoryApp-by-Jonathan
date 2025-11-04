@@ -24,22 +24,23 @@ const APP_SHELL = [
 
 // Install event - cache app shell
 self.addEventListener('install', (event) => {
-  // Try to add all shell resources but handle missing items gracefully to avoid failing install
+  // Try to add all shell resources, log failures, and ensure install completes
   event.waitUntil(
     caches.open(CACHE_NAME).then(async (cache) => {
-      try {
-        await cache.addAll(APP_SHELL);
-        console.log('[SW] Cached app shell successfully');
-      } catch (err) {
-        console.warn('[SW] Some resources failed to cache during install:', err && err.message ? err.message : err);
-        // Attempt to add resources individually so available ones are cached
-        for (const resource of APP_SHELL) {
-          try {
-            await cache.add(resource);
-          } catch (e) {
-            console.warn('[SW] Failed to cache resource:', resource, e && e.message ? e.message : e);
-          }
+      const failedResources = [];
+      for (const resource of APP_SHELL) {
+        try {
+          await cache.add(resource);
+          console.log('[SW] Cached:', resource);
+        } catch (e) {
+          failedResources.push(resource);
+          console.warn('[SW] Failed to cache resource:', resource, e && e.message ? e.message : e);
         }
+      }
+      if (failedResources.length > 0) {
+        console.error('[SW] These resources failed to cache:', failedResources);
+      } else {
+        console.log('[SW] All app shell resources cached successfully');
       }
     }).then(() => self.skipWaiting())
   );
