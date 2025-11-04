@@ -46,6 +46,35 @@ self.addEventListener('install', (event) => {
   );
 });
 
+  // Caching data dinamis dari API (advance offline)
+  self.addEventListener('fetch', (event) => {
+    const requestUrl = new URL(event.request.url);
+    // Caching untuk API stories (ubah sesuai endpoint API kamu)
+    if (requestUrl.pathname.startsWith('/api/stories')) {
+      event.respondWith(
+        caches.open(API_CACHE_NAME).then(async (cache) => {
+          try {
+            const networkResponse = await fetch(event.request);
+            // Simpan response ke cache jika sukses
+            if (networkResponse && networkResponse.status === 200) {
+              cache.put(event.request, networkResponse.clone());
+            }
+            return networkResponse;
+          } catch (error) {
+            // Jika offline, ambil dari cache
+            return cache.match(event.request);
+          }
+        })
+      );
+      return;
+    }
+    // Default: app shell (offline)
+    event.respondWith(
+      caches.match(event.request).then((response) => {
+        return response || fetch(event.request);
+      })
+    );
+  });
 // Activate event - clean old caches
 self.addEventListener('activate', (event) => {
   const cacheWhitelist = [CACHE_NAME, API_CACHE_NAME];
