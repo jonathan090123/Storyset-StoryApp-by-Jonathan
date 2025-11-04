@@ -21,7 +21,7 @@ export default class AddStoryView {
             </div>
 
             <div class="form-group">
-              <label>Tambah Foto</label>
+              <label for="photo">Tambah Foto</label>
               <div class="photo-input-group">
                 <input 
                   type="file" 
@@ -50,7 +50,7 @@ export default class AddStoryView {
             </div>
 
             <div class="form-group">
-              <label>Lokasi (Klik pada peta)</label>
+              <label for="add-story-map">Lokasi (Klik pada peta)</label>
               <div id="add-story-map" class="map" role="application" aria-label="Pilih lokasi pada peta"></div>
               <p class="form-hint">
                 Latitude: <span id="lat-display">-</span>, 
