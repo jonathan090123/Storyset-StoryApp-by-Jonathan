@@ -1,2 +1,2 @@
-APP_URL= lucky-gingersnap-9f84e8.netlify.app
+APP_URL= thunderous-genie-02780f.netlify.app
 MAP_SERVICE_API_KEY=<api_key> // Tidak diperlukan API 
