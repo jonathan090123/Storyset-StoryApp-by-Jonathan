@@ -12,6 +12,7 @@ import {
     hideLoading,
     showToast
 } from '../../utils';
+import { isNotificationsEnabled } from '../../utils/notification-state';
 import {
     initMap
 } from '../../utils/map-helper';
@@ -118,8 +119,8 @@ export default class AddStoryPresenter {
                     ]
                 };
 
-                // If browser supports Notification API directly, show a local notification
-                if ('Notification' in window && Notification.permission === 'granted') {
+                // Only show notification if notifications are enabled in our app and browser supports it
+                if ('Notification' in window && Notification.permission === 'granted' && isNotificationsEnabled()) {
                     new Notification(notificationPayload.title, {
                         body: notificationPayload.body,
                         icon: notificationPayload.icon,

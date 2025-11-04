@@ -31,8 +31,43 @@ export async function requestNotificationPermission() {
   return permission;
 }
 
+// Open notification settings database
+function openNotificationDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('NotificationSettings', 1);
+    
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+    
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains('settings')) {
+        db.createObjectStore('settings');
+      }
+    };
+  });
+}
+
+// Set notification state in IndexedDB
+async function setNotificationState(enabled) {
+  const db = await openNotificationDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(['settings'], 'readwrite');
+    const store = transaction.objectStore('settings');
+    const request = store.put(enabled, 'enabled');
+    
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve();
+  });
+}
+
 export async function subscribeForPush(registration) {
   if (!registration || !registration.pushManager) throw new Error('Invalid service worker registration');
+  
+  // Enable notifications in both IndexedDB and localStorage
+  await setNotificationState(true);
+  localStorage.setItem('notification_enabled', 'true');
+  
   const existing = await registration.pushManager.getSubscription();
   if (existing) return existing;
 
@@ -42,18 +77,47 @@ export async function subscribeForPush(registration) {
     applicationServerKey,
   });
 
-  // store locally for convenience
+  // store subscription
   localStorage.setItem('storyset_push_subscription', JSON.stringify(subscription));
   return subscription;
 }
 
 export async function unsubscribeFromPush(registration) {
-  if (!registration || !registration.pushManager) throw new Error('Invalid service worker registration');
-  const subscription = await registration.pushManager.getSubscription();
-  if (!subscription) return false;
-  const success = await subscription.unsubscribe();
-  localStorage.removeItem('storyset_push_subscription');
-  return success;
+  try {
+    // Immediately disable notifications in both storages
+    await setNotificationState(false);
+    localStorage.setItem('notification_enabled', 'false');
+    localStorage.removeItem('storyset_push_subscription');
+    
+    // Get all service worker registrations
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    
+    // Unsubscribe from all
+    for (const reg of registrations) {
+      if (reg.pushManager) {
+        const subscription = await reg.pushManager.getSubscription();
+        if (subscription) {
+          await subscription.unsubscribe();
+        }
+      }
+      await reg.unregister();
+    }
+
+    // Clear all caches
+    const cacheNames = await caches.keys();
+    await Promise.all(cacheNames.map(name => caches.delete(name)));
+    
+    // Force page reload to ensure clean state
+    window.location.reload();
+    return true;
+    
+  } catch (error) {
+    console.error('Failed to unsubscribe:', error);
+    // Ensure notifications stay disabled even if error
+    await setNotificationState(false);
+    localStorage.setItem('notification_enabled', 'false');
+    throw error;
+  }
 }
 
 export async function isPushSubscribed(registration) {

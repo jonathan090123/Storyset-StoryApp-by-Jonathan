@@ -47,8 +47,51 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// Open notification settings database
+function openNotificationDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('NotificationSettings', 1);
+    
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+    
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains('settings')) {
+        db.createObjectStore('settings');
+      }
+    };
+  });
+}
+
+// Check if notifications are enabled
+async function isNotificationsEnabled() {
+  try {
+    const db = await openNotificationDB();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(['settings'], 'readonly');
+      const store = transaction.objectStore('settings');
+      const request = store.get('enabled');
+      
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => resolve(request.result === true);
+    });
+  } catch (error) {
+    console.error('Error checking notification state:', error);
+    return false;
+  }
+}
+
 // Handle incoming push events. Expect data as JSON with { title, body, icon, url, actions }
-self.addEventListener('push', (event) => {
+self.addEventListener('push', async (event) => {
+  // First check if notifications are enabled in IndexedDB
+  const isEnabled = await isNotificationsEnabled();
+  
+  if (!isEnabled) {
+    console.log('Notifications are disabled, ignoring push event');
+    return;
+  }
+  
   let data = { title: 'Storyset', body: 'You have a new message', icon: '/images/storyset.png', url: '/', actions: [] };
   try {
     if (event.data) {
@@ -62,18 +105,24 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: data.body,
-    icon: data.icon || '/images/storyset.png', // Icon utama menggunakan foto story
-    image: data.image, // Thumbnail gambar story yang lebih besar
-    badge: data.icon || '/images/storyset.png', // Badge juga menggunakan foto story
+    icon: data.icon || '/images/storyset.png',
+    image: data.image,
+    badge: data.icon || '/images/storyset.png',
     data: {
       url: data.url || '/',
       payload: data.payload || null,
     },
     actions: Array.isArray(data.actions) ? data.actions : [],
-    // Tampilkan gambar lebih besar di notifikasi
     silent: false,
-    requireInteraction: true, // Notifikasi tidak otomatis hilang
+    requireInteraction: true,
   };
+
+  // Double check subscription before showing notification
+  const subscription = await self.registration.pushManager.getSubscription();
+  if (!subscription) {
+    console.log('No active subscription, ignoring push event');
+    return;
+  }
 
   event.waitUntil(self.registration.showNotification(data.title || 'Storyset', options));
 });

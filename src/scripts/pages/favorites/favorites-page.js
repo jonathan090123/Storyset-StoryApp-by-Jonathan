@@ -18,15 +18,7 @@ export default class FavoritesPage {
 
   async afterRender() {
     await this.presenter.loadFavoriteStories();
-
-    // Event handler untuk tombol Hapus dari Favorit
-    const removeFavButtons = document.querySelectorAll('.remove-favorite-btn');
-    removeFavButtons.forEach((btn) => {
-      btn.addEventListener('click', async (e) => {
-        e.stopPropagation(); // Prevent card click event
-        const storyId = btn.getAttribute('data-story-id');
-        await this.presenter.removeStoryFromFavorite(storyId);
-      });
-    });
+    // Re-setup event listeners after rendering
+    this.presenter.setupEventListeners();
   }
 }

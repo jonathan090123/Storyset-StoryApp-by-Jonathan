@@ -6,6 +6,21 @@ export default class FavoritesPresenter {
   constructor(view) {
     this.view = view;
     this.favoriteStories = [];
+    this.setupEventListeners();
+  }
+
+  setupEventListeners() {
+    const favoritesContainer = document.getElementById('favorites-list');
+    if (favoritesContainer) {
+      favoritesContainer.addEventListener('click', async (e) => {
+        if (e.target.matches('.remove-favorite-btn')) {
+          const storyId = e.target.dataset.storyId;
+          if (storyId) {
+            await this.removeStoryFromFavorite(storyId);
+          }
+        }
+      });
+    }
   }
 
   async loadFavoriteStories() {
